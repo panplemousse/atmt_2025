@@ -34,7 +34,7 @@ python train.py \
     --data cz-en/data/prepared/ \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --source-lang cs \
+    --source-lang cz \
     --target-lang en \
     --batch-size 64 \
     --arch transformer \
