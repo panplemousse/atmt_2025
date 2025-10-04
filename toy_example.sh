@@ -65,4 +65,5 @@ python translate.py \
     --max-len 100 \
     --output toy_example/toy_example_output.en \
     --bleu \
-    --reference toy_example/data/raw/test.en
+    --reference toy_example/data/raw/test.en \
+    --cuda
