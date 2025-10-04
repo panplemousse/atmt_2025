@@ -22,4 +22,6 @@ python translate.py \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
     --checkpoint-path cz-en/checkpoints/checkpoint_best.pt \
     --output sk-en/output.txt \
+    --bleu \
+    --reference sk-en/data/raw/test.sk \
     --max-len 300
