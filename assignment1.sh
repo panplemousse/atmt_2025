@@ -15,7 +15,7 @@ export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
 
 # PREPARE DATA
 python preprocess.py \
-    --source-lang cz \
+    --source-lang cs \
     --target-lang en \
     --raw-data ~/shares/cz-en/data/raw \
     --dest-dir ./cz-en/data/prepared \
@@ -34,7 +34,7 @@ python train.py \
     --data cz-en/data/prepared/ \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --source-lang cz \
+    --source-lang cs \
     --target-lang en \
     --batch-size 64 \
     --arch transformer \
