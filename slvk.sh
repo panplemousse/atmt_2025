@@ -23,5 +23,5 @@ python translate.py \
     --checkpoint-path cz-en/checkpoints/checkpoint_best.pt \
     --output sk-en/output.txt \
     --bleu \
-    --reference sk-en/data/raw/test.sk \
+    --reference sk-en/data/raw/test.en \
     --max-len 300
