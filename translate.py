@@ -17,6 +17,10 @@ from torch.serialization import default_restore_location
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+from seq2seq.decode import beam_search_decode, decode
+from seq2seq.data.tokenizer import BPETokenizer
+from seq2seq import models, utils
+from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
 
 def decode_to_string(tokenizer, array):
     """
@@ -40,7 +44,9 @@ def get_args():
     parser.add_argument('--batch-size', default=1, type=int, help='maximum number of sentences in a batch')
     parser.add_argument('--output', required=True, type=str, help='path to the output file destination')
     parser.add_argument('--max-len', default=128, type=int, help='maximum length of generated sequence')
-
+    # Beam search decoding parameters
+    parser.add_argument('--beam-size', default=5, type=int, help='beam size for beam search decoding')
+    parser.add_argument('--alpha', default=0.7, type=float, help='length normalization hyperparameter for beam search')
     # BLEU computation arguments
     parser.add_argument('--bleu', action='store_true', help='If set, compute BLEU score after translation')
     parser.add_argument('--reference', type=str,
@@ -148,14 +154,25 @@ def main(args):
 
             # -----------------------------------------
             # Decode without teacher forcing
-            prediction = decode(model=model,
-                                src_tokens=src_tokens,
-                                src_pad_mask=src_pad_mask,
-                                max_out_len=args.max_len,
-                                tgt_tokenizer=tgt_tokenizer,
-                                args=args,
-                                device=DEVICE)
-            # ----------------------------------------
+            if args.beam_size == 1:
+                prediction = decode(model=model,
+                                      src_tokens=src_tokens,
+                                      src_pad_mask=src_pad_mask,
+                                      max_out_len=args.max_len,
+                                      tgt_tokenizer=tgt_tokenizer,
+                                      args=args,
+                                      device=DEVICE)
+            else:
+                prediction = beam_search_decode(model=model,
+                                              src_tokens=src_tokens,
+                                              src_pad_mask=src_pad_mask,
+                                              max_out_len=args.max_len,
+                                              tgt_tokenizer=tgt_tokenizer,
+                                              args=args,
+                                              device=DEVICE,
+                                              beam_size=args.beam_size,
+                                              alpha=args.alpha)
+            #----------------------------------------
 
         # Remove BOS and decode each sentence
         for sent in prediction:
