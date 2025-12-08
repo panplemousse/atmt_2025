@@ -3,6 +3,7 @@ import sentencepiece as spm
 from seq2seq.models import Seq2SeqModel
 import math
 
+
 def decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor, max_out_len: int,
            tgt_tokenizer: spm.SentencePieceProcessor, args, device: torch.device):
     """Decodes a sequence without teacher forcing. Works by relying on the model's own predictions, rather than the ground truth (trg_)"""
@@ -114,7 +115,7 @@ def beam_search_decode_rlp(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pa
         new_beams = []
         for seq, score in beams:
             if seq[0, -1].item() == EOS:
-                new_beams.append((seq, score))
+                new_beams.append((seq, score, 0.0))
                 continue
             with torch.no_grad():
 
