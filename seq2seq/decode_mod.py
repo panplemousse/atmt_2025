@@ -76,10 +76,15 @@ def beam_search_decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_ma
             for k in range(beam_size):
                 # __QUESTION 4: explain the tensor shapes and the logic when creating new_seq and new_score below. Is any broadcasting or indexing issue possible?
                 new_seq = torch.cat([seq, topk_ids[:, k].unsqueeze(0)], dim=1)
-                new_score = score + topk_log_probs[:, k].item()
+                new_score = score + topk_log_probs[:, k].item()  # stores the probability
                 new_beams.append((new_seq, new_score))
 
-        beams = sorted(new_beams, key=lambda x: x[1], reverse=True)[:beam_size]
+        def length_penalty(beam):
+            seq, score = beam
+            length = seq.size(1)
+            return score / ((5 + length) / 6) ** alpha
+        # sort according to normalized score but dont store the normalized score
+        beams = sorted(new_beams, key=length_penalty, reverse=True)[:beam_size]
         # __QUESTION 5: Why do we check for EOS here and what does it imply for beam search?
         if all(seq[0, -1].item() == EOS for seq, _ in beams):
             break
