@@ -51,6 +51,8 @@ def get_args():
 
     parser.add_argument('--mod-decode', action='store_true', help='If set, use modified decoding method')
     parser.add_argument('--small-sample', type=int, help='translate only the first n samples')
+    parser.add_argument('--local-threshold', type=float, help='translate only the first n samples')
+    parser.add_argument('--maximum-candidates', type=int, help='maximum number of candidates per node for beam search pruning')
 
     return parser.parse_args()
 
@@ -70,8 +72,15 @@ def main(args):
     # make_batch = utils.make_batch_input(device='cuda' if args.cuda else 'cpu',
     #                                     pad=src_tokenizer.pad_id(),
     #                                     max_seq_len=args.max_len)
+    assert not (args.local_threshold and args.maximum_candidates), "Cannot use both local_threshold and maximum_candidates simultaneously."
     if args.mod_decode:
-        from seq2seq.decode_mod import beam_search_decode, decode
+        from seq2seq.decode_mod import decode
+        if args.local_threshold:
+            from seq2seq.decode_mod import beam_search_decode_rlp as beam_search_decode
+        elif args.maximum_candidates:
+            from seq2seq.decode_mod import beam_search_decode_mcn as beam_search_decode
+        else:
+            from seq2seq.decode_mod import beam_search_decode
     else:
         from seq2seq.decode import beam_search_decode, decode
     # batch input sentences
@@ -167,6 +176,18 @@ def main(args):
                                     tgt_tokenizer=tgt_tokenizer,
                                     args=args,
                                     device=DEVICE)
+            elif args.mod_decode:
+                prediction = beam_search_decode(model=model,
+                                                src_tokens=src_tokens,
+                                                src_pad_mask=src_pad_mask,
+                                                max_out_len=args.max_len,
+                                                tgt_tokenizer=tgt_tokenizer,
+                                                args=args,
+                                                device=DEVICE,
+                                                beam_size=args.beam_size,
+                                                alpha=args.alpha,
+                                                local_threshold=args.local_threshold,
+                                                maximum_candidates=args.maximum_candidates)
             else:
                 prediction = beam_search_decode(model=model,
                                                 src_tokens=src_tokens,
