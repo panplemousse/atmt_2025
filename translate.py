@@ -1,8 +1,8 @@
-from seq2seq.decode import beam_search_decode, decode
+
 from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
 from seq2seq import models, utils
 from seq2seq.data.tokenizer import BPETokenizer
-from seq2seq.decode import decode
+# from seq2seq.decode import decode
 import os
 import logging
 import argparse
@@ -70,11 +70,11 @@ def main(args):
     # make_batch = utils.make_batch_input(device='cuda' if args.cuda else 'cpu',
     #                                     pad=src_tokenizer.pad_id(),
     #                                     max_seq_len=args.max_len)
-
-    # batch input sentences
-
     if args.mod_decode:
         from seq2seq.decode_mod import beam_search_decode, decode
+    else:
+        from seq2seq.decode import beam_search_decode, decode
+    # batch input sentences
 
     def batch_iter(lst, batch_size):
         for i in range(0, len(lst), batch_size):

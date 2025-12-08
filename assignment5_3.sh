@@ -22,6 +22,7 @@ python translate.py \
     --output cz-en/outputs/beam/output_beam1_ori.txt \
     --bleu \
     --reference ~/shares/cz-en/data/raw/test.en \
+    --beam-size 1 \
     --small-sample 80 \
     --max-len 300
 
@@ -35,6 +36,7 @@ python translate.py \
     --output cz-en/outputs/beam/output_beam1_mod.txt \
     --bleu \
     --reference ~/shares/cz-en/data/raw/test.en \
+    --beam-size 1 \
     --mod-decode \
     --small-sample 80 \
     --max-len 300
