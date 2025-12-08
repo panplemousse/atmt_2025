@@ -53,6 +53,7 @@ python translate.py \
     --bleu \
     --reference ~/shares/cz-en/data/raw/test.en \
     --beam-size 3\
+    --small-sample 80 \
     --max-len 300
 
 # TRANSLATE beam 3 modified decode
