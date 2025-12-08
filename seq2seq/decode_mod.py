@@ -1,7 +1,7 @@
 import torch
 import sentencepiece as spm
 from seq2seq.models import Seq2SeqModel
-
+import math
 
 def decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor, max_out_len: int,
            tgt_tokenizer: spm.SentencePieceProcessor, args, device: torch.device):
@@ -135,7 +135,7 @@ def beam_search_decode_rlp(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pa
                 new_score = score + token_log_porb  # stores the probability
                 new_beams.append((new_seq, new_score, token_log_porb))
         top_token_prob = max(new_beams, key=lambda x: x[2])[2]
-        prob_threshold = local_threshold*top_token_prob
+        prob_threshold = math.log(local_threshold) + top_token_prob
         new_beams = [(seq, score) for seq, score, token_log_prob in new_beams
                      if token_log_prob > prob_threshold]
         # sort according to normalized score but dont store the normalized score
