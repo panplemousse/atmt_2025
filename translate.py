@@ -49,7 +49,7 @@ def get_args():
     parser.add_argument('--reference', type=str,
                         help='Path to the reference file (one sentence per line, required if --bleu is set)')
 
-    parser.add_argument('--mod_decode', action='store_true', help='If set, use modified decoding method')
+    parser.add_argument('--mod-decode', action='store_true', help='If set, use modified decoding method')
 
     return parser.parse_args()
 
