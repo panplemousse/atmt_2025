@@ -5,28 +5,12 @@
 #SBATCH --mem=16GB
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus=1
-#SBATCH --output=out1_assignment5.out
+#SBATCH --output=beam_and_optimize_assignment5.out
 
 module load gpu
 module load mamba
 source activate atmt
 export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
-
-
-# PREPARE DATA
-python preprocess.py \
-    --source-lang cz \
-    --target-lang en \
-    --raw-data ~/shares/cz-en/data/raw \
-    --dest-dir ./cz-en/data/prepared \
-    --model-dir ./cz-en/tokenizers \
-    --test-prefix test \
-    --train-prefix train \
-    --valid-prefix valid \
-    --src-vocab-size 8000 \
-    --tgt-vocab-size 8000 \
-    --src-model ./cz-en/tokenizers/cz-bpe-8000.model \
-    --tgt-model ./cz-en/tokenizers/en-bpe-8000.model
 
 # TRANSLATE beam 1 (greedy)
 python translate.py \
@@ -34,10 +18,11 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_best.pt \
-    --output cz-en/outputs/beam/output.txt \
+    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_averaged_last3.pt \
+    --output cz-en/outputs/beam/output_beam1_ori.txt \
     --bleu \
     --reference ~/shares/cz-en/data/raw/test.en \
+    --small-sample 80 \
     --max-len 300
 
 # TRANSLATE beam 1 (greedy) modified decode
@@ -46,11 +31,12 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_best.pt \
-    --output cz-en/outputs/beam/output.txt \
+    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_averaged_last3.pt \
+    --output cz-en/outputs/beam/output_beam1_mod.txt \
     --bleu \
-    --mod-decode \
     --reference ~/shares/cz-en/data/raw/test.en \
+    --mod-decode \
+    --small-sample 80 \
     --max-len 300
 
 
@@ -60,11 +46,11 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_best.pt \
-    --output cz-en/outputs/beam/output.txt \
+    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_averaged_last3.pt \
+    --output cz-en/outputs/beam/output_beam3_ori.txt \
     --bleu \
-    --beam-size 3\
     --reference ~/shares/cz-en/data/raw/test.en \
+    --beam-size 3\
     --max-len 300
 
 # TRANSLATE beam 3 modified decode
@@ -73,12 +59,13 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_best.pt \
-    --output cz-en/outputs/beam/output.txt \
+    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_averaged_last3.pt \
+    --output cz-en/outputs/beam/output_beam3_mod.txt \
     --bleu \
+    --reference ~/shares/cz-en/data/raw/test.en \
     --beam-size 3\
     --mod-decode \
-    --reference ~/shares/cz-en/data/raw/test.en \
+    --small-sample 80 \
     --max-len 300
 
 # TRANSLATE beam 5
@@ -87,11 +74,12 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_best.pt \
-    --output cz-en/outputs/beam/output.txt \
+    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_averaged_last3.pt \
+    --output cz-en/outputs/beam/output_beam5_ori.txt \
     --bleu \
-    --beam-size 5\
     --reference ~/shares/cz-en/data/raw/test.en \
+    --beam-size 5\
+    --small-sample 80 \
     --max-len 300
 
 # TRANSLATE beam 5 modified decode
@@ -100,10 +88,11 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_best.pt \
-    --output cz-en/outputs/beam/output.txt \
+    --checkpoint-path cz-en/checkpoints/gqa/checkpoint_averaged_last3.pt \
+    --output cz-en/outputs/beam/output_beam5_mod.txt \
     --bleu \
+    --reference ~/shares/cz-en/data/raw/test.en \
     --beam-size 5\
     --mod-decode \
-    --reference ~/shares/cz-en/data/raw/test.en \
+    --small-sample 80 \
     --max-len 300

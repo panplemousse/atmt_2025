@@ -50,6 +50,7 @@ def get_args():
                         help='Path to the reference file (one sentence per line, required if --bleu is set)')
 
     parser.add_argument('--mod-decode', action='store_true', help='If set, use modified decoding method')
+    parser.add_argument('--small-sample', type=int, help='translate only the first n samples')
 
     return parser.parse_args()
 
@@ -90,6 +91,8 @@ def main(args):
     # Read input sentences
     with open(args.input, encoding="utf-8") as f:
         src_lines = [line.strip() for line in f if line.strip()]
+    if args.small_sample is not None:
+        src_lines = src_lines[:args.small_sample]
 
     # Encode input sentences
     src_encoded = [torch.tensor(src_tokenizer.Encode(line, out_type=int, add_eos=True)) for line in src_lines]
@@ -193,6 +196,8 @@ def main(args):
     if getattr(args, 'bleu', False):
         with open(args.reference, encoding='utf-8') as ref_file:
             references = [line.strip() for line in ref_file if line.strip()]
+        if args.small_sample is not None:
+            references = references[:args.small_sample]
         if len(references) != len(translations):
             raise ValueError(f"Reference ({len(references)}) and hypothesis ({len(translations)}) line counts do not match.")
         bleu = sacrebleu.corpus_bleu(translations, [references])
